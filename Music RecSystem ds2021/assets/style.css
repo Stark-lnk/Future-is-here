@@ -1,0 +1,122 @@
+body {
+    font-family: "Lato", sans-serif;
+    margin: 0;
+    background-color: #F7F7F7;
+}
+
+.header {
+    background-color: #222222;
+    height: 350px;
+    padding: 16px 0 0 0;
+}
+
+.header-emoji {
+    font-size: 48px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.header-title {
+    color: #FFFFFF;
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.header-description {
+    color: #CFCFCF;
+    margin: 4px auto;
+    text-align: center;
+    max-width: 500px;
+}
+
+.output-style {
+    color: #6e6e6e;
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 20px;
+
+}
+
+.wrapper {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1024px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-top: 32px;
+}
+
+.sliders {
+    float: left;
+    width: 46%;
+    margin-right: 10px;
+    margin-left: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-top: 32px;
+    margin-bottom: 20px;
+}
+
+.table-top {
+    margin-right: auto;
+    margin-left: auto;
+    width: 80%;
+    padding-right: 100px;
+    padding-left: 10px;
+    margin-top: 32px;
+    padding: 10px 0 100px 0px;
+}
+
+.table {
+    margin-right: auto;
+    margin-left: auto;
+    width: 1000px;
+    padding-right: 100px;
+    padding-left: 100px;
+    margin-top: 32px;
+    padding: 100px 100px 100px 100px;
+}
+.card {
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.menu {
+    height: 112px;
+    width: 1200px;
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 24px;
+    margin: -80px auto 0 auto;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.dropdown {
+    width: 301px;
+    height: 48px;
+}
+
+.Select-control {
+    width: 301px;
+    height: 48px;
+}
+
+.Select--single > .Select-control .Select-value, .Select-placeholder {
+    line-height: 48px;
+}
+
+.Select--multi .Select-value-label {
+    line-height: 40px;
+}
+
+.menu-title {
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #079A82;
+}
+
