@@ -8,5 +8,4 @@ The main idea is to create specific filters which can help you to find the best 
 Try it using weblink: https://rec-music-minor-ds2021.herokuapp.com
 
 
-Original data base got from [kaggle.com] 
-(https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks?select=data_by_artist_o.csv)
+Original data base got from [kaggle.com](https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks?select=data_by_artist_o.csv)
