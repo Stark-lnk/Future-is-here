@@ -5,22 +5,18 @@ import pandas as pd
 import dash_table
 from dash.dependencies import Output, Input
 import random
+import numpy as np
 
 table_greeting = ['Смотри что мы тебе подобрали!', 'А мне нравится твой вкус!', 'Бомбические песни строкой ниже ;)',
                   'Это точно поднимет настроение😉', 'Лучшие треки только у нас🤩', 'Прекрасный выбор))0)',
                   "Мне тоже нравится❤"]
 
-data = pd.read_csv("data/tracks3.csv").sample(30000).reset_index(drop=True)
+data = pd.read_csv("data/tracks5.csv").sample(30000).reset_index(drop=True)
 data['artists'] = data['artists'].map(lambda x: ', '.join(x[1:-1].replace("'", '').split(',')))
+
+
 # all_artists = pd.read_csv("data/artists.csv")['0']
 # song_names = pd.read_csv("data/song_names.csv")['name']
-
-try:
-    data['release_date'] = data['release_date'].map(lambda x: int(x[:4]))
-    data.dropna(inplace=True)
-except:
-    pass
-
 
 # ________________________________-functions-________________________________
 # get list of artists
@@ -54,6 +50,49 @@ def show_final_df(df):
                        'release_date': 'Год выпуска'}, inplace=True)
     # df['Исполнитель'] = df['Исполнитель'].map(lambda x: ', '.join(x[1:-1].replace("'", '').split(',')))
     return df
+
+
+
+# _________________________________-Recomendation-______________________
+# normalize dataframe to calculate manhattan distance
+def normalize_column(df_col):
+    max_d = df_col.max()
+    min_d = df_col.min()
+    return (df_col - min_d) / (max_d - min_d)
+
+
+class SpotifyRecommender():
+    def __init__(self, rec_data):
+        self.rec_data_ = rec_data
+        for col_name in self.rec_data_.columns:
+            if col_name not in ['id', 'name', 'artists', 'id_artists', 'release_date', 'key']:
+                self.rec_data_[col_name] = normalize_column(self.rec_data_[col_name])
+
+    def change_data(self, rec_data):
+        self.rec_data_ = rec_data
+
+    def get_recommendations(self, song_name, amount=5):
+        distances = []
+        # choosing the data for our song
+        song = self.rec_data_[(self.rec_data_.name.str.lower() == song_name.lower())].head(1).values[0]
+        # dropping the data with our song
+        res_data = self.rec_data_[self.rec_data_.name.str.lower() != song_name.lower()]
+        for r_song in res_data.values:
+            dist = 0
+            for col, col_name in enumerate(data.columns):
+                # non-numerical columns
+                if col_name not in ['id', 'name', 'artists', 'id_artists', 'release_date', 'key']:
+                    # calculating the manhattan distances for each numerical feature
+                    dist = dist + np.absolute(float(song[col]) - float(r_song[col]))
+            distances.append(dist)
+        res_data.loc[:, 'distance'] = distances
+        # sorting our data to be ascending by 'distance' feature
+        res_data = res_data.sort_values('distance').reset_index(drop=True)
+        res_data = res_data.loc[:amount, ['name', 'artists', 'release_date']]
+        res_data.rename(columns={'name': 'Название песни', 'popularity': 'Популярность', 'artists': 'Исполнитель',
+                           'release_date': 'Год выпуска'}, inplace=True)
+        return res_data
+
 
 
 # ________________________________ # ________________________________
@@ -206,7 +245,7 @@ app.layout = html.Div(
                 html.Div(id='output-acousticness-slider', className='output-style'),
 
             ],
-            className="sliders"),
+            className="sliders_right"),
 
         # ________________________________-Table with results-________________________________
         html.Div(children=[
@@ -242,7 +281,7 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     children=[
-                        html.Div(children="Название песни", className="menu-title"),
+                        html.Div(children="Название любимой песни", className="menu-title"),
                         dcc.Dropdown(
                             id="song-name-filter",
                             options=[
@@ -331,7 +370,7 @@ def update_output(artists, year, danceability, energy, liveness, speechiness, ac
     if len(artists) > 0:
         filtered_data = pd.DataFrame()
         for artist in artists:
-            mask = (data.artists.str.contains(artist))
+            mask = (data.artists.str.lower().str.contains(artist.lower()))
             filtered_data = filtered_data.append(data.loc[mask, :])
     else:
         filtered_data = data.copy()
@@ -361,12 +400,14 @@ def update_output(artists, year, danceability, energy, liveness, speechiness, ac
     [Input("song-name-filter", 'value'), ]
 )
 def update_output(song_name):
-    mask = (data.name == song_name)
-    filtered_data = data.loc[mask, :]
-    if len(filtered_data) > 10:
-        filtered_data = filtered_data.sample(10)
 
-    filtered_data = show_final_df(filtered_data)
+    if song_name in list(data.name):
+        recommender = SpotifyRecommender(data)
+        filtered_data = recommender.get_recommendations(song_name, 10)
+    else:
+        filtered_data = pd.DataFrame(columns=show_final_df(data.loc[[1]]).columns)
+        filtered_data.loc[1] = ['Выбери песню', "и", "Я всё тебе покажу!", "И наслаждайся;)"]
+
     return filtered_data.to_dict('records'), [{"name": i, "id": i} for i in filtered_data.columns]
 
 
